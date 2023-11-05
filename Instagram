@@ -1,1 +1,113 @@
-["015.yusuboff","015.yusuboff","015.yusuboff","015.yusuboff"]
+<?php
+
+// Telegram Bot API anahtarınızı buraya girin
+if($_GET["token"]){
+    $apiToken=$_GET["token"];
+}else{
+$apiToken = '6373881974:AAEBi92ji-TyAkg-rRsIIb2VFH9HrJu4DME';
+}
+// Botunuzun kullanıcı adını buraya girin
+$botUsername = 'groupsoyus1_bot';
+
+// Telegram API'sine istek yapmak için bir işlev
+function apiRequest($method, $parameters)
+{
+    $url = "https://api.telegram.org/bot" . $GLOBALS['apiToken'] . "/" . $method;
+    $handle = curl_init($url);
+    curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($handle, CURLOPT_TIMEOUT, 60);
+    curl_setopt($handle, CURLOPT_POSTFIELDS, $parameters);
+    $response = curl_exec($handle);
+    if ($response === false) {
+        curl_close($handle);
+        return false;
+    } else {
+        $response = json_decode($response, true);
+        curl_close($handle);
+        return $response;
+    }
+}
+
+// Küfür kelime listesi
+$badWords = array('gijd','peyser','amcıq',"qehbe","pesi","ananı","neslini","seni doğanı","s2m","sikim","neslivi","qancığ","peysər","əlinə verim","cindir","qəhbə","anavı","sıkım","sikim","blət","blet","cındır","qehi","qəhi","qancıq","qanciq","SIK","SİKIm","seks","seksi","cndr","skm","qhbə","quşbala","anani","b.acni","bacini","var yoxu","ogras","ograş","oğraş",'sįk','si-kim');
+
+// Webhook üzerinden gelen isteği işleme
+$update = json_decode(file_get_contents('php://input'), true);
+
+// Gelen mesajı al
+$message = isset($update['message']) ? $update['message'] : null;
+
+// Mesajın metnini al
+$text = isset($message['text']) ? $message['text'] : '';
+
+// Mesajın kimden geldiğini al
+$chatId = isset($message['chat']['id']) ? $message['chat']['id'] : '';
+
+// Mesajı gönderen kullanıcının ID'sini al
+$senderId = isset($message['from']['id']) ? $message['from']['id'] : '';
+
+$calldata=$update['callback_query']['data'];
+
+// Mesajı gönderen kullanıcının adını al
+$senderName = isset($message['from']['first_name']) ? $message['from']['first_name'] : '';
+if(strpos($text,"/bot ")!== false){
+   //tokeni alıp webhook bağladın api ile
+   $tok = substr($text, 5);
+   file_get_contents("https://api.telegram.org/bot$tok/setwebhook?url=https://xezerchain.com/bot/index.php?token=$tok");
+   apiRequest('sendMessage', array('chat_id' => $chatId, 'text' => "🔌 Qoşuldu"));
+
+    die;
+}
+// Başlangıç komutunu kontrol et
+
+if ($text == '/start') {
+    $apiUrl = "https://api.telegram.org/bot$apiToken/getMe";
+
+$responsee = file_get_contents($apiUrl);
+$dataa = json_decode($responsee, true);
+
+if ($dataa && isset($dataa['ok']) && $dataa['ok']) {
+    $botUsername = $dataa['result']['username'];
+    
+} else {
+    
+}
+
+    // Hoş geldin mesajını gönder
+    $message = 'Salam ' . $senderName . ", Mən Qurupdaki Söyüşləri Avtomatik Silən Botam.\n\n📢 Qurubuna Əlavə Edib Silmə Yetkisi Ver Bəsdir.";
+
+    // Create the inline keyboard with a link button to your channel
+    $inlineKeyboard = array(
+        'inline_keyboard' => array(
+            array(
+                array(
+                    'text' => '📢 Kanal', // Button text
+                    'url' => 'https://t.me/pulsuzinterne2' // Channel URL
+                ),
+                array(
+                    'text' => '☎️ Sahib', // Button text
+                    'url' => 'https://t.me/yusuboff_015' // Channel URL
+                )
+            ),
+            array(
+                array(
+                    'text' => '📦 Klonla', // Button text
+                    'callback_data'=> 'klon' // Channel URL
+                )
+            ),
+            array(
+                array(
+                    'text' => '📎 Guruba Əlavə Et', // Button text
+                    'url' => "https://telegram.me/$botUsername?startgroup=true" // Channel URL
+                )
+            )
+        )
+    );
+
+    // Convert the keyboard array to JSON format
+    $replyMarkup = json_encode($inlineKeyboard);
+
+    // Send the message with the link button
+    apiRequest('sendMessage', array('chat_id' => $chatId, 'text' => $message, 'reply_markup' => $replyMarkup));
+}
