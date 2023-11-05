@@ -4,7 +4,7 @@
 if($_GET["token"]){
     $apiToken=$_GET["token"];
 }else{
-$apiToken = '6373881974:AAEBi92ji-TyAkg-rRsIIb2VFH9HrJu4DME';
+$apiToken = '6331852170:AAFyMFXV9Nt_BS-JwWywK1I4al5bgVCpPik';
 }
 // Botunuzun kullanıcı adını buraya girin
 $botUsername = 'groupsoyus1_bot';
